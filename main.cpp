@@ -4,18 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#define SAFE_BAIL(x) \
-    if (x) \
-    { \
-        goto fail; \
-    }
-
-#define SAFE_FREE(x) \
-    if (x) \
-    { \
-        free(x); \
-        x = 0; \
-    }
+#include "bgrep_e.h"
 
 void usage(char* callername)
 {
@@ -85,27 +74,7 @@ int main(int argc, char** argv)
     fread(in_file_raw, 1, in_file_sz, in_file);
     fclose(in_file);
 
-    SAFE_BAIL(in_file_sz < byte_length);
-    for (int i = 0; i < (in_file_sz - byte_length); i++)
-    {
-        if (memcmp(&in_file_raw[i], byte_search, byte_length) == 0)
-        {
-            printf("found occurance at ");
-            if (dec_out)
-            {
-                printf("%d\n", i);
-            }
-            else
-            {
-                printf("0x%x\n", i);
-            }
-
-            if (find_first)
-            {
-                break;
-            }
-        }
-    }
+    bsearch_total(in_file_raw, in_file_sz, byte_search, byte_length, NULL, find_first, dec_out);
     
 fail:
     SAFE_FREE(in_file_raw);
