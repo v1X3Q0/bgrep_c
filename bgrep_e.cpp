@@ -44,3 +44,34 @@ int bsearch(uint8_t* in_file_raw, size_t in_file_sz, uint8_t* byte_search, int b
 {
     return bsearch_total(in_file_raw, in_file_sz, byte_search, byte_length, found_addr, 1, 0);
 }
+
+int search_seq(uint8_t* kern_copy, size_t img_var_sz, uint8_t* byte_search, size_t search_sz,
+    size_t offset, size_t step, bool match, void** out_img_off)
+{
+    int result = -1;
+    uint8_t* iterPoint = 0;
+
+    iterPoint = (uint8_t*)((size_t)kern_copy + offset);
+
+    for (int kern_index = offset; kern_index < img_var_sz; kern_index += step, iterPoint += step)
+    {
+        // principal behind this is we can search for, for instance, a nonzero block using this same
+        // routine. so  if 0 == 0) == true, then it will keep going. but if non == 0) ~ false, then
+        // all good
+        if ((memcmp(byte_search, iterPoint, search_sz) == 0) == match)
+        {
+            *out_img_off = iterPoint;
+            goto found;
+        }
+    }
+    goto fail;
+found:
+    result = 0;
+fail:
+    return result;
+}
+
+int binary_ss::findPattern(uint8_t* startAddress, size_t sizeSearch, void** resultAddr)
+{
+    return search_seq(startAddress, sizeSearch, byte_search, byte_length, offset, step, match, resultAddr);
+};
