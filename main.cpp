@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "bgrep_c_util.h"
+#include <localUtil.h>
 
 void usage(char* callername)
 {
