@@ -72,7 +72,70 @@ fail:
     return result;
 }
 
-int binary_ss::findPattern(uint8_t* startAddress, size_t sizeSearch, void** resultAddr)
+int binary_ss::findPattern_fixed(uint8_t* startAddress, size_t sizeSearch, void** resultAddr)
 {
     return search_seq(startAddress, sizeSearch, byte_search, byte_length, offset, step, match, resultAddr);
 };
+
+int search_set::findPattern(uint8_t* startAddress, size_t sizeSearch, void** resultAddr)
+{
+    int result = -1;
+
+    // start at same starting point, but . finish condition is when
+    // cur < (start + size)
+    if (((signed long)sizeSearch < 0) && (step < 0))
+    {
+        // sizeSearch = -sizeSearch;
+    }
+    // start at size from starting address, and step down on each iteration
+    // so end at original starting point. finish condition is when
+    // cur < (start + size)
+    else if (((signed long)sizeSearch > 0) && (step < 0))
+    {
+        startAddress += sizeSearch;
+    }
+    // start from an address below wanted start, and positive step towards
+    // initial start. finish condition is when cur > (start + size)
+    else if (((signed long)sizeSearch < 0) && (step > 0))
+    {
+        startAddress += sizeSearch;
+    }
+    // start from start address and step up til size. finish condition is
+    // cur > (start + size)
+    else if (((signed long)sizeSearch > 0) && (step > 0))
+    {
+
+    }
+
+    return findPattern_fixed(startAddress, sizeSearch, resultAddr);
+}
+
+// return true if things need to return
+bool search_set::evaluateFinish(uint8_t* curAddr, uint8_t* endAddr)
+{
+    bool result = false;
+    
+    if (step < 0)
+    {
+        if (curAddr < endAddr)
+        {
+            result = true;
+        }
+    }
+    else if (step > 0)
+    {
+        if (curAddr > endAddr)
+        {
+            result = true;
+        }
+    }
+
+    return result;
+}
+
+void search_set::internal_reset(size_t offset_a, size_t step_a, bool match_a)
+{
+    offset = offset_a;
+    step = step_a;
+    match = match_a;
+}
