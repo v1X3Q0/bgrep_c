@@ -12,7 +12,6 @@ int search_seq(uint8_t* kern_copy, size_t img_var_sz, uint8_t* byte_search, size
 class search_set
 {
 public:
-    virtual int findPattern_fixed(uint8_t* startAddress, size_t sizeSearch, void** resultAddr) = 0;
     search_set(size_t offset_a, size_t step_a, bool match_a) : offset(offset_a), step(step_a), match(match_a) {};
     int findPattern(uint8_t* startAddress, size_t sizeSearch, void** resultAddr);
     bool evaluateFinish(uint8_t* curAddr, uint8_t* endAddr);
@@ -21,6 +20,8 @@ protected:
     size_t offset;
     int step;
     bool match;
+
+    virtual int findPattern_fixed(uint8_t* startAddress, size_t sizeSearch, void** resultAddr) = 0;
 };
 
 class binary_ss : public search_set
@@ -28,9 +29,11 @@ class binary_ss : public search_set
 public:
     uint8_t* byte_search;
     int byte_length;
-public:
+
     binary_ss(uint8_t* byte_search_a, int byte_length_a, size_t offset_a, size_t step_a, bool match_a) : search_set(offset_a, step_a, match_a),
         byte_search(byte_search_a), byte_length(byte_length_a) {};
+
+protected:
     int findPattern_fixed(uint8_t* startAddress, size_t sizeSearch, void** resultAddr);
 };
 

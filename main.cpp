@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include "bgrep_e.h"
 
 #ifdef _WIN32
 #include <getopt.h>
@@ -28,47 +29,43 @@ int bsearch_file(const char* in_file_name, int count, void** vargs)
     size_t in_file_sz = 0;
     uint8_t* in_file_raw = 0;
 
+    int difference_tmp = 0;
+    void* result_addr = 0;
+
     size_t byte_length = (size_t)vargs[0];
     uint8_t* byte_search = (uint8_t*)vargs[1];
     size_t find_first = (size_t)vargs[2];
     size_t dec_out = (size_t)vargs[3];
 
-    in_file = fopen(in_file_name, "r");
-    SAFE_BAIL(in_file == 0);
+    binary_ss search_target(byte_search, byte_length, 0, 1, true);
 
-    fseek(in_file, 0, SEEK_END);
-    in_file_sz = ftell(in_file);
-    fseek(in_file, 0, SEEK_SET);
+    SAFE_BAIL(block_grab(in_file_name, (void**)&in_file_raw, &in_file_sz) == -1);
 
-    in_file_raw = (uint8_t*)calloc(in_file_sz, 1);
-    SAFE_BAIL(in_file_raw == 0);
-
-    fread(in_file_raw, 1, in_file_sz, in_file);
-    fclose(in_file);
-
-    SAFE_BAIL(in_file_sz < byte_length);
-    for (int i = 0; i < (in_file_sz - byte_length); i++)
+    result_addr = in_file_raw;
+    while (true)
     {
-        if (memcmp(&in_file_raw[i], byte_search, byte_length) == 0)
-        {
-            printf("%s: found occurance at ", in_file_name);
-            if (dec_out)
-            {
-                printf("%d\n", i);
-            }
-            else
-            {
-                printf("0x%x\n", i);
-            }
+        SAFE_BAIL(search_target.findPattern((uint8_t*)result_addr, in_file_sz, &result_addr) == -1);
+        result = 0;
+        difference_tmp = (size_t)result_addr - (size_t)in_file_raw;
 
-            if (find_first)
-            {
-                break;
-            }
+        printf("%s: found occurance at ", in_file_name);
+        if (dec_out)
+        {
+            printf("%d\n", difference_tmp);
         }
+        else
+        {
+            printf("0x%x\n", difference_tmp);
+        }
+
+        if (find_first)
+        {
+            break;
+        }
+
+        result_addr = (void*)((size_t)result_addr + 1);
     }
-    
-    result = 0;
+
 fail:
     SAFE_FREE(in_file_raw);
     return result;

@@ -77,6 +77,7 @@ int binary_ss::findPattern_fixed(uint8_t* startAddress, size_t sizeSearch, void*
     return search_seq(startAddress, sizeSearch, byte_search, byte_length, offset, step, match, resultAddr);
 };
 
+// find a pattern
 int search_set::findPattern(uint8_t* startAddress, size_t sizeSearch, void** resultAddr)
 {
     int result = -1;
