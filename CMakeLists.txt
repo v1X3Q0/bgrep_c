@@ -5,7 +5,7 @@ if(NOT DEFINED ANDROID_TOOL_BASE)
     message(FATAL_ERROR "need ANDROID_TOOL_BASE")
 endif()
 
-add_library(bgrep_e STATIC bgrep_e.cpp)
+add_library(bgrep_e SHARED bgrep_e.cpp)
 target_include_directories(bgrep_e PRIVATE ${ANDROID_TOOL_BASE}/common/local_util)
 
 set(INCLUDE_LIST ${ANDROID_TOOL_BASE}/common/local_util)
