@@ -31,6 +31,7 @@ int bsearch_file(const char* in_file_name, int count, void** vargs)
 
     int difference_tmp = 0;
     void* result_addr = 0;
+    size_t result_sz = 0;
 
     size_t byte_length = (size_t)vargs[0];
     uint8_t* byte_search = (uint8_t*)vargs[1];
@@ -42,11 +43,13 @@ int bsearch_file(const char* in_file_name, int count, void** vargs)
     SAFE_BAIL(block_grab(in_file_name, (void**)&in_file_raw, &in_file_sz) == -1);
 
     result_addr = in_file_raw;
+    result_sz = in_file_sz;
     while (true)
     {
-        SAFE_BAIL(search_target.findPattern((uint8_t*)result_addr, in_file_sz, &result_addr) == -1);
+        SAFE_BAIL(search_target.findPattern((uint8_t*)result_addr, result_sz, &result_addr) == -1);
         result = 0;
         difference_tmp = (size_t)result_addr - (size_t)in_file_raw;
+        result_sz = in_file_sz - difference_tmp;
 
         printf("%s: found occurance at ", in_file_name);
         if (dec_out)
