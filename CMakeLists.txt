@@ -1,8 +1,10 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.5)
 project(bgrep_c VERSION 0.1.0)
 
 if(NOT DEFINED ANDROID_TOOL_BASE)
-    message(FATAL_ERROR "need ANDROID_TOOL_BASE")
+    message(WARNING  "need ANDROID_TOOL_BASE")
+    set(ANDROID_TOOL_BASE ${CMAKE_CURRENT_SOURCE_DIR})
+    add_subdirectory(common/local_util)
 endif()
 
 add_library(bgrep_e SHARED bgrep_e.cpp)
